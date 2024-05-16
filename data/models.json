@@ -1,0 +1,157 @@
+{
+    "Amenity": [
+        {
+            "id": "a34bb185-d6e7-4d78-a519-995c51ada64d",
+            "name": "toilet",
+            "created_at": 1715564316.28423,
+            "updated_at": 1715564316.28423
+        },
+        {
+            "id": "69cf5e16-b2dc-4bec-ac39-991850fc946b",
+            "name": "tv",
+            "created_at": 1715564316.284361,
+            "updated_at": 1715564316.284361
+        },
+        {
+            "id": "7acf0975-1b7e-4f74-829e-bf35d1537246",
+            "name": "mini-bar",
+            "created_at": 1715564492.781085,
+            "updated_at": 1715564492.781085
+        },
+        {
+            "id": "bf4efa5c-f488-45cb-9816-bbafd0fc5008",
+            "name": "air-con",
+            "created_at": 1715564492.781194,
+            "updated_at": 1715564492.781194
+        }
+    ],
+    "City": [
+        {
+            "id": "687da7c4-eaba-411f-b00d-65c954eb2b8c",
+            "country_id": "04051500-051f-4e0f-97ba-e452cbb14d19",
+            "name": "Melbourne",
+            "created_at": 1715412378.488704,
+            "updated_at": 1715412378.488704
+        },
+        {
+            "id": "26c940c0-f4c8-4dd7-b12d-45a113d41099",
+            "country_id": "04051500-051f-4e0f-97ba-e452cbb14d19",
+            "name": "Sydney",
+            "created_at": 1715412378.488731,
+            "updated_at": 1715412378.488731
+        }
+    ],
+    "Country": [
+        {
+            "id": "04051500-051f-4e0f-97ba-e452cbb14d19",
+            "name": "Australia",
+            "code": "AU",
+            "created_at": 1715412135.350238,
+            "updated_at": 1715412135.350238
+        },
+        {
+            "id": "16168846-2992-407a-ad15-3bbe906d2b75",
+            "name": "New Zealand",
+            "code": "NZ",
+            "created_at": 1715412194.926692,
+            "updated_at": 1715412194.926692
+        },
+        {
+            "id": "f9948747-3b60-419b-a92f-5ee31882a6d7",
+            "name": "USA",
+            "code": "US",
+            "created_at": 1715412248.735104,
+            "updated_at": 1715412248.735104
+        }
+    ],
+    "Place": [
+        {
+            "id": "90c83333-35d4-4638-bdd8-1eceac56915e",
+            "host_user_id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "city_id": "687da7c4-eaba-411f-b00d-65c954eb2b8c",
+            "name": "Ringwood Hotel",
+            "description": "A decent hotel",
+            "address": "Next to Eastland Mall",
+            "latitude": -37.814666,
+            "longitude": 145.230620,
+            "number_of_rooms": 5,
+            "bathrooms": 1,
+            "price_per_night": 150.00,
+            "max_guests": 2,
+            "created_at": 1715566897.190475,
+            "updated_at": 1715566897.190475
+        },
+        {
+            "id": "cee845de-c341-4f5a-a0c5-2ca1f4c327b2",
+            "host_user_id": "460897e2-5953-40ea-8773-00a2851a1ba8",
+            "city_id": "687da7c4-eaba-411f-b00d-65c954eb2b8c",
+            "name": "Blackburn Hotel",
+            "description": "An OK hotel",
+            "address": "Opposite the road from the Indian curry place",
+            "latitude": -37.817270,
+            "longitude": 145.151919,
+            "number_of_rooms": 20,
+            "bathrooms": 0,
+            "price_per_night": 120.00,
+            "max_guests": 1,
+            "created_at": 1715566897.190596,
+            "updated_at": 1715566897.190596
+        },
+        {
+            "id": "a1a3d915-68c8-4771-9bf4-498b9ae62463",
+            "host_user_id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "city": "687da7c4-eaba-411f-b00d-65c954eb2b8c",
+            "name": "Box Hill Motel",
+            "description": "Very expensive motel",
+            "address": "Next to Box Hill bus terminal",
+            "latitude": -37.818990,
+            "longitude": 145.122095,
+            "number_of_rooms": 18,
+            "bathrooms": 2,
+            "price_per_night": 200.00,
+            "max_guests": 3,
+            "created_at": 1715566923.500334,
+            "updated_at": 1715566923.500334
+        }
+    ],
+    "Review": [
+        {
+            "id": "92c2e4eb-a446-463d-b8e3-8810b0150276",
+            "commentor_user_id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "place_id": "cee845de-c341-4f5a-a0c5-2ca1f4c327b2",
+            "feedback": "The place stinks and the floor is dirty",
+            "rating": 0.35,
+            "created_at": 1715575358.020767,
+            "updated_at": 1715575358.020767
+        },
+        {
+            "id": "ae78332d-53d6-4fdc-b0e3-d9d4cb6099b3",
+            "commentor_user_id": "460897e2-5953-40ea-8773-00a2851a1ba8",
+            "place_id": "a1a3d915-68c8-4771-9bf4-498b9ae62463",
+            "feedback": "Very expensive",
+            "rating": 0.1,
+            "created_at": 1715575358.020792,
+            "updated_at": 1715575358.020792
+        }
+    ],
+    "User": [
+        {
+            "id": "0215a722-a3fc-4f08-9120-f8621147f2be",
+            "first_name": "Clark",
+            "last_name": "Kent",
+            "email": "iluvsuperman@email.com",
+            "password": "1234",
+            "created_at": 1715563526.942737,
+            "updated_at": 1715563526.942737
+        },
+        {
+            "id": "460897e2-5953-40ea-8773-00a2851a1ba8",
+            "first_name": "Bruce",
+            "last_name": "Wayne",
+            "email": "batmanforever@email.com",
+            "password": "4321",
+            "created_at": 1715563526.942768,
+            "updated_at": 1715563526.942768
+        }
+    ]
+}
