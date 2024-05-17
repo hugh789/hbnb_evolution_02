@@ -1,22 +1,69 @@
+#!/usr/bin/python3
+"""This module defines a class to manage file storage for hbnb evolution"""
+
 import json
 from pathlib import Path
 
 class FileStorage():
     """ Class for reading data from JSON files """
+    __data = {}
+    __classes = ["Amenity", "City", "Country", "Place", "Review", "User"]
 
     def load_data(self, is_testing = False):
-        """ Load JSON data from file and returns as dictionary """
-        data = {}
+        """ Load JSON data from file and stores it all in __data """
 
         models_filepath = "data/models_testing.json" if is_testing else "data/models.json"
         relations_filepath = "data/relations_testing.json" if is_testing else "data/relations.json"
 
-        data['models'] = self.load_models_data(models_filepath)
-        data['relations'] = self.load_many_to_many_relations_data(relations_filepath)
+        self.__data['models'] = self.__load_models_data(models_filepath)
+        self.__data['relations'] = self.__load_many_to_many_relations_data(relations_filepath)
 
-        return data
+    def get(self, class_name = "", record_id = ""):
+        """ Return all data or data for specified class name and / or id"""
 
-    def load_models_data(self, filepath):
+        if class_name != "":
+            if class_name in self.__classes:
+                if record_id != "":
+                    if record_id in self.__data['models'][class_name]:
+                        return self.__data['models'][class_name][record_id]
+                    else:
+                        raise IndexError("Unable to load Model data. Specified id not found")
+                else:
+                    return self.__data['models'][class_name]
+            else:
+                raise IndexError("Unable to load Model data. Specified class name not found")
+
+        return self.__data['models']
+
+    def add(self, class_name, data):
+        """ Adds another entry to specified class """
+
+        if class_name in self.__classes:
+            # create if it doesn't exist
+            if class_name not in self.__data['models']:
+                self.__data['models'][class_name] = {}
+
+            # add to correct location
+            if data['id'] not in self.__data['models'][class_name]:
+                self.__data['models'][class_name][data['id']] = data
+            else:
+                raise IndexError("An item with the same id already exists")
+        else:
+            raise IndexError("Specified class name is not valid")
+
+        if class_name == "" or class_name not in self.__data['models']:
+            raise IndexError("Model data does not have an. Specified class name not found")
+
+    def update(self, class_name, record_id, data):
+        """ Updates existing entry of specified class """
+
+        if class_name in self.__classes:
+            if class_name not in self.__data['models'] or record_id not in self.__data['models'][class_name]:
+                raise IndexError("Unable to find the record to update")
+
+        self.__data['models'][class_name][record_id] = data
+
+    def __load_models_data(self, filepath):
         """ Load JSON data from models file and returns as dictionary """
         temp = {}
         models_data = {}
@@ -41,7 +88,7 @@ class FileStorage():
         # print(json.dumps(model_data))
         return models_data
 
-    def load_many_to_many_relations_data(self, filepath):
+    def __load_many_to_many_relations_data(self, filepath):
         """ Load JSON data from relations file and returns as dictionary """
 
         temp = {}
