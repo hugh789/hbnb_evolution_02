@@ -66,10 +66,13 @@ class FileStorage():
                 relations_data[keys[0]] = {}
 
             if keys[1] not in relations_data[keys[0]]:
-                relations_data[keys[0]][keys[1]] = []
+                relations_data[keys[0]][keys[1]] = {}
 
             for row in value:
-                relations_data[keys[0]][keys[1]].append(row)
+                if row['place_id'] not in relations_data[keys[0]][keys[1]]:
+                    relations_data[keys[0]][keys[1]][row['place_id']] = []
+
+                relations_data[keys[0]][keys[1]][row['place_id']].append(row['amenity_id'])
 
         # print(json.dumps(relations_data))
         return relations_data

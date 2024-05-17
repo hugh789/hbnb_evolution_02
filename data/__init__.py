@@ -21,3 +21,11 @@ else:
     storage = DBStorage()
 
 all_data = storage.load_data(is_testing)
+
+country_data = all_data['models']['Country']
+city_data = all_data['models']['City']
+amenity_data = all_data['models']['Amenity']
+place_data = all_data['models']['Place']
+user_data = all_data['models']['User']
+review_data = all_data['models']['Review']
+place_to_amenity_data = all_data['relations']['Place']['Amenity']
