@@ -9,6 +9,8 @@ class FileStorage():
     __data = {}
     __classes = ["Amenity", "City", "Country", "Place", "Review", "User"]
 
+    # No constructor in this class - doesn't seem like we really need one anyway
+
     def load_data(self, is_testing = False):
         """ Load JSON data from file and stores it all in __data """
 

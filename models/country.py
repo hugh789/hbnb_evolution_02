@@ -4,28 +4,42 @@ from datetime import datetime
 import uuid
 import re
 from flask import jsonify, request, abort
-from data import storage
+from sqlalchemy import Column, String, DateTime
+from sqlalchemy.orm import relationship
+from data import storage, use_db_storage, Base
 
-class Country():
+class Country(Base):
     """Representation of country """
+
+    # Class attrib defaults
+    id = None
+    created_at = None
+    updated_at = None
+    __name = ""
+    __code = ""
+
+    if use_db_storage:
+        __tablename__ = 'countries'
+        id = Column(String(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
+        updated_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
+        __name = Column("name", String(128), nullable=False, default="")
+        __code = Column("code", String(2), nullable=False, default="")
+        cities = relationship("City", back_populates="country", cascade="delete, delete-orphan")
 
     # Constructor
     def __init__(self, *args, **kwargs):
         """ constructor """
-        # super().__init__(*args, **kwargs)
-
-        # defaults
+        # Set object instance defaults
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
-        self.__name = ""
-        self.__code = ""
 
         # Only allow name, code.
         # Note that setattr will call the setters for these attribs
         if kwargs:
             for key, value in kwargs.items():
-                if key == "name" or key == "code":
+                if key in ["name", "code"]:
                     setattr(self, key, value)
 
     # --- Getters and Setters ---

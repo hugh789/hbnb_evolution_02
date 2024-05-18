@@ -3,31 +3,48 @@
 from datetime import datetime
 import uuid
 import re
+import json
 from flask import jsonify, request, abort
-from data import storage
+from sqlalchemy import Column, String, DateTime
+from data import storage, use_db_storage, Base
 
-class User():
+class User(Base):
     """Representation of user """
+
+    # Class attrib defaults
+    id = None
+    created_at = None
+    updated_at = None
+    __first_name = ""
+    __last_name = ""
+    __email = ""
+    __password = ""
+
+    if use_db_storage:
+        __tablename__ = 'users'
+        id = Column(String(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
+        updated_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
+        __first_name = Column("first_name", String(128), nullable=True, default="")
+        __last_name = Column("last_name", String(128), nullable=True, default="")
+        __email = Column("email", String(128), nullable=False)
+        __password = Column("password", String(128), nullable=False)
+        # places = relationship("Place", back_populates="user",cascade="delete, delete-orphan")
+        # reviews = relationship("Review", back_populates="user",cascade="delete, delete-orphan")
 
     # Constructor
     def __init__(self, *args, **kwargs):
         """ constructor """
-        # super().__init__(*args, **kwargs)
-
-        # defaults
+        # Set object instance defaults
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now().timestamp()
         self.updated_at = self.created_at
-        self.__first_name = ""
-        self.__last_name = ""
-        self.__email = ""
-        self.__password = ""
 
         # Only allow first_name, last_name, email, password.
         # Note that setattr will call the setters for these attribs
         if kwargs:
             for key, value in kwargs.items():
-                if key == "first_name" or key == "last_name" or key == "email" or key == "password":
+                if key in ["first_name", "last_name", "email", "password"]:
                     setattr(self, key, value)
 
     # --- Getters and Setters ---
@@ -101,6 +118,10 @@ class User():
         """ Class method that returns all users data"""
         data = []
         user_data = storage.get('User')
+
+        # Data loaded from the DB needs additional cleanup before it can be used
+        if use_db_storage:
+            user_data = User.to_dict(user_data)
 
         for k, v in user_data.items():
             data.append({
@@ -222,3 +243,10 @@ class User():
 
         # print out the updated user details
         return jsonify(attribs)
+
+    @staticmethod
+    def to_dict(data):
+        """ Perform cleanup on raw DB data and return as dictionary"""
+        # TODO:
+        print(data.__dict__)
+        return data
