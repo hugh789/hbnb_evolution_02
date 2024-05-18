@@ -141,13 +141,6 @@ class User():
     @staticmethod
     def create():
         """ Class method that creates a new user"""
-        # -- Usage example --
-        # curl -X POST localhost:5000/api/v1/users /
-        #   -H "Content-Type: application/json" /
-        #   -d '{"first_name":"Peter","last_name":"Parker","email":"p.parker@daily-bugle.net","password":"123456"}'
-
-        # print(request.content_type)
-
         if request.get_json() is None:
             abort(400, "Not a JSON")
 
@@ -191,11 +184,6 @@ class User():
     @staticmethod
     def update(user_id):
         """ Class method that updates an existing user"""
-        # -- Usage example --
-        # curl -X PUT [URL] /
-        #    -H "Content-Type: application/json" /
-        #    -d '{"key1":"value1","key2":"value2"}'
-
         if request.get_json() is None:
             abort(400, "Not a JSON")
 

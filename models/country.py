@@ -101,11 +101,6 @@ class Country():
     @staticmethod
     def create():
         """ Class method that creates a new country"""
-        # -- Usage example --
-        # curl -X POST [URL] /
-        #    -H "Content-Type: application/json" /
-        #    -d '{"key1":"value1","key2":"value2"}'
-
         if request.get_json() is None:
             abort(400, "Not a JSON")
 
@@ -143,11 +138,6 @@ class Country():
     @staticmethod
     def update(country_code):
         """ Class method that updates an existing country"""
-        # -- Usage example --
-        # curl -X PUT [URL] /
-        #    -H "Content-Type: application/json" /
-        #    -d '{"key1":"value1","key2":"value2"}'
-
         c = {}
 
         if request.get_json() is None:
