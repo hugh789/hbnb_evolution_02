@@ -10,12 +10,9 @@ class DBStorage():
     """ Class for reading data from databases """
     __engine = None
     __session = None
-    __data = {}
-    __base = None
     __module_names = {
-        "BaseModel": "base_model",
         "User": "user",
-        "State": "state",
+        "Country": "country",
         "City": "city",
         "Amenity": "amenity",
         "Place": "place",
@@ -35,16 +32,16 @@ class DBStorage():
         # If you were lazy and didn't specify anything on the command line, then the defaults below will be used
         # PLEASE DON'T DO THIS IN A REAL WORKING ENVIRONMENT
         if user is None:
-            user = "hbnb_dev"
+            user = "hbnb_evo"
         if pwd is None:
-            pwd = "hbnb_dev_pwd"
+            pwd = "hbnb_evo_pwd"
         if host is None:
             host = "localhost"
         if db is None:
             if is_testing == "1":
                 db = "hbnb_test_db"
             else:
-                db = "hbnb_dev_db"
+                db = "hbnb_evo_db"
 
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(user, pwd, host, db))
 
@@ -61,9 +58,22 @@ class DBStorage():
     def get(self, class_name = "", record_id = ""):
         """ Return all data or data for specified class name and / or id"""
 
+        if class_name == "":
+            raise IndexError("Unable to load Model data. No class name specified")
+
+        if not self.__module_names[class_name]:
+            raise IndexError("Unable to load Model data. Specified class name not found")
+
         namespace = self.__module_names[class_name]
         module = importlib.import_module("models." + namespace)
         class_ = getattr(module, class_name)
-        rows = self.__session.query(class_).all()
+
+        if record_id == "":
+            rows = self.__session.query(class_).all()
+        else:
+            try:
+                rows = self.__session.query(class_).where(class_.id == record_id).limit(1).one()
+            except:
+                raise IndexError("Unable to load Model data. Specified id not found")
 
         return rows

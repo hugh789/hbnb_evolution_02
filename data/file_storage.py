@@ -23,19 +23,23 @@ class FileStorage():
     def get(self, class_name = "", record_id = ""):
         """ Return all data or data for specified class name and / or id"""
 
-        if class_name != "":
-            if class_name in self.__classes:
-                if record_id != "":
-                    if record_id in self.__data['models'][class_name]:
-                        return self.__data['models'][class_name][record_id]
-                    else:
-                        raise IndexError("Unable to load Model data. Specified id not found")
-                else:
-                    return self.__data['models'][class_name]
-            else:
-                raise IndexError("Unable to load Model data. Specified class name not found")
+        if class_name == "":
+            raise IndexError("Unable to load Model data. No class name specified")
 
-        return self.__data['models']
+        if class_name not in self.__classes:
+            raise IndexError("Unable to load Model data. Specified class name not found")
+
+        if record_id == "":
+            return self.__data['models'][class_name]
+        else:
+            if record_id not in self.__data['models'][class_name]:
+                raise IndexError("Unable to load Model data. Specified id not found")
+
+            return self.__data['models'][class_name][record_id]
+
+            
+
+
 
     def add(self, class_name, data):
         """ Adds another entry to specified class """

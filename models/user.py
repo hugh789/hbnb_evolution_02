@@ -117,22 +117,39 @@ class User(Base):
     def all():
         """ Class method that returns all users data"""
         data = []
-        user_data = storage.get('User')
+        datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
 
-        # Data loaded from the DB needs additional cleanup before it can be used
+        try:
+            user_data = storage.get('User')
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to load users!"
+
         if use_db_storage:
-            user_data = User.to_dict(user_data)
-
-        for k, v in user_data.items():
-            data.append({
-                "id": v['id'],
-                "first_name": v['first_name'],
-                "last_name": v['last_name'],
-                "email": v['email'],
-                "password": v['password'],
-                "created_at": datetime.fromtimestamp(v['created_at']),
-                "updated_at": datetime.fromtimestamp(v['updated_at'])
-            })
+            # DBStorage
+            for row in user_data:
+                # use print(row.__dict__) to see the contents of the sqlalchemy model objects
+                data.append({
+                    "id": row.id,
+                    "first_name": row.first_name,
+                    "last_name": row.last_name,
+                    "email": row.email,
+                    "password": row.password,
+                    "created_at": row.created_at.strftime(datetime_format),
+                    "updated_at": row.updated_at.strftime(datetime_format)
+                })
+        else:
+            # FileStorage
+            for k, v in user_data.items():
+                data.append({
+                    "id": v['id'],
+                    "first_name": v['first_name'],
+                    "last_name": v['last_name'],
+                    "email": v['email'],
+                    "password": v['password'],
+                    "created_at": datetime.fromtimestamp(v['created_at']),
+                    "updated_at": datetime.fromtimestamp(v['updated_at'])
+                })
 
         return jsonify(data)
 
@@ -140,22 +157,36 @@ class User(Base):
     def specific(user_id):
         """ Class method that returns a specific user's data"""
         data = []
-        user_data = storage.get('User')
+        datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
 
-        if user_id not in user_data:
-            # raise IndexError("User not found!")
+        try:
+            user_data = storage.get('User', user_id)
+        except IndexError as exc:
+            print("Error: ", exc)
             return "User not found!"
 
-        v = user_data[user_id]
-        data.append({
-            "id": v['id'],
-            "first_name": v['first_name'],
-            "last_name": v['last_name'],
-            "email": v['email'],
-            "password": v['password'],
-            "created_at": datetime.fromtimestamp(v['created_at']),
-            "updated_at": datetime.fromtimestamp(v['updated_at'])
-        })
+        if use_db_storage:
+            # DBStorage
+            data.append({
+                "id": user_data.id,
+                "first_name": user_data.first_name,
+                "last_name": user_data.last_name,
+                "email": user_data.email,
+                "password": user_data.password,
+                "created_at": user_data.created_at.strftime(datetime_format),
+                "updated_at": user_data.updated_at.strftime(datetime_format)
+            })
+        else:
+            # FileStorage
+            data.append({
+                "id": user_data['id'],
+                "first_name": user_data['first_name'],
+                "last_name": user_data['last_name'],
+                "email": user_data['email'],
+                "password": user_data['password'],
+                "created_at": datetime.fromtimestamp(user_data['created_at']),
+                "updated_at": datetime.fromtimestamp(user_data['updated_at'])
+            })
 
         return jsonify(data)
 
@@ -243,10 +274,3 @@ class User(Base):
 
         # print out the updated user details
         return jsonify(attribs)
-
-    @staticmethod
-    def to_dict(data):
-        """ Perform cleanup on raw DB data and return as dictionary"""
-        # TODO:
-        print(data.__dict__)
-        return data

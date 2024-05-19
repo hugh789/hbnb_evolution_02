@@ -23,8 +23,8 @@ class Country(Base):
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
         updated_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
-        __name = Column("name", String(128), nullable=False, default="")
-        __code = Column("code", String(2), nullable=False, default="")
+        __name = Column("name", String(128), nullable=False)
+        __code = Column("code", String(2), nullable=False)
         cities = relationship("City", back_populates="country", cascade="delete, delete-orphan")
 
     # Constructor

@@ -23,8 +23,8 @@ class City():
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
         updated_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
-        __name = Column("name", String(128), nullable=False, default="")
-        __country_id = Column("country", String(2), nullable=False, default="")
+        __name = Column("name", String(128), nullable=False)
+        __country_id = Column("country", String(2), nullable=False)
         country = relationship("Country", back_populates="cities")
 
     # constructor
