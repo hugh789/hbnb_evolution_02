@@ -58,7 +58,7 @@ class DBStorage():
         self.__session = Session()
 
     def get(self, class_name = "", record_id = ""):
-        """ Return all data or data for specified class name and / or id"""
+        """ Return data for specified class name with or without record id"""
 
         if class_name == "":
             raise IndexError("Unable to load Model data. No class name specified")
@@ -97,7 +97,7 @@ class DBStorage():
 
         # 1. find the record using the record_id
         # 2. update the record according to what is specified in the 'allowed' list
-        # 3. 'save' the record back into memory and return it
+        # 3. 'save' the record back into the db and return it
 
         if class_name.strip() == "" or not self.__module_names[class_name]:
             raise IndexError("Specified class name is not valid")

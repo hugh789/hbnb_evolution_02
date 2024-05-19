@@ -215,6 +215,9 @@ class User(Base):
         except ValueError as exc:
             return repr(exc) + "\n"
 
+        # TODO: add a check here to ensure that the provided email is not already used by someone else in the DB
+        # If you see this message, tell me and I will (maybe) give you a cookie lol
+
         output = {
             "id": new_user.id,
             "first_name": new_user.first_name,
