@@ -53,14 +53,30 @@ class FileStorage():
         # add to existing data and return
         self.__data['models'][class_name][new_record['id']] = new_record
 
-    def update(self, class_name, record_id, data):
+    def update(self, class_name, record_id, update_data, allowed = None):
         """ Updates existing entry of specified class """
+
+        # 1. find the record using the record_id
+        # 2. update the record according to what is specified in the 'allowed' list
+        # 3. 'save' the record back into memory and return it
 
         if class_name in self.__classes:
             if class_name not in self.__data['models'] or record_id not in self.__data['models'][class_name]:
                 raise IndexError("Unable to find the record to update")
 
-        self.__data['models'][class_name][record_id] = data
+        record = self.get(class_name, record_id)
+
+        # update the record values
+        for k, v in update_data.items():
+            if allowed is not None and len(allowed) > 0:
+                if k in allowed:
+                    record[k] = v
+            else:
+                record[k] = v
+
+        self.__data['models'][class_name][record_id] = record
+
+        return record
 
     def __load_models_data(self, filepath):
         """ Load JSON data from models file and returns as dictionary """

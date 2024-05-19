@@ -3,6 +3,7 @@
 
 import importlib
 from os import getenv
+from copy import deepcopy
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -90,3 +91,44 @@ class DBStorage():
         self.__session.add(new_record)
         self.__session.commit()
         self.__session.refresh(new_record)
+
+    def update(self, class_name, record_id, update_data, allowed = None):
+        """ Updates existing record of specified class """
+
+        # 1. find the record using the record_id
+        # 2. update the record according to what is specified in the 'allowed' list
+        # 3. 'save' the record back into memory and return it
+
+        if class_name.strip() == "" or not self.__module_names[class_name]:
+            raise IndexError("Specified class name is not valid")
+
+        # Assume that the database table already exists so we're not doing CREATE TABLE here
+
+        namespace = self.__module_names[class_name]
+        module = importlib.import_module("models." + namespace)
+        class_ = getattr(module, class_name)
+
+        try:
+            record = self.__session.query(class_).where(class_.id == record_id).limit(1).one()
+        except:
+            raise IndexError("Unable to find the record to update")
+
+        # update the record values
+
+        try:
+            for k, v in update_data.items():
+                if allowed is not None and len(allowed) > 0:
+                    if k in allowed:
+                        setattr(record, k, v)
+                else:
+                    setattr(record, k, v)
+
+            # Don't forget to update the updated_at value! You just updated the record you know...
+            record.updated_at = datetime.now()
+
+            self.__session.commit()
+        except:
+            raise IndexError("Unable to update record")
+
+        # For safety, don't return the original record. Return a copy instead
+        return deepcopy(record)

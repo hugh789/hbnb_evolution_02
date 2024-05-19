@@ -122,7 +122,6 @@ class User(Base):
     def all():
         """ Class method that returns all users data"""
         data = []
-        datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
 
         try:
             user_data = storage.get('User')
@@ -140,8 +139,8 @@ class User(Base):
                     "last_name": row.last_name,
                     "email": row.email,
                     "password": row.password,
-                    "created_at": row.created_at.strftime(datetime_format),
-                    "updated_at": row.updated_at.strftime(datetime_format)
+                    "created_at": row.created_at.strftime(User.datetime_format),
+                    "updated_at": row.updated_at.strftime(User.datetime_format)
                 })
         else:
             # FileStorage
@@ -162,7 +161,6 @@ class User(Base):
     def specific(user_id):
         """ Class method that returns a specific user's data"""
         data = []
-        datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
 
         try:
             user_data = storage.get('User', user_id)
@@ -178,8 +176,8 @@ class User(Base):
                 "last_name": user_data.last_name,
                 "email": user_data.email,
                 "password": user_data.password,
-                "created_at": user_data.created_at.strftime(datetime_format),
-                "updated_at": user_data.updated_at.strftime(datetime_format)
+                "created_at": user_data.created_at.strftime(User.datetime_format),
+                "updated_at": user_data.updated_at.strftime(User.datetime_format)
             })
         else:
             # FileStorage
@@ -228,13 +226,13 @@ class User(Base):
 
         try:
             if use_db_storage:
-                # DBStorage - note that the add method uses the User object instance
+                # DBStorage - note that the add method uses the User object instance 'new_user'
                 storage.add('User', new_user)
                 # datetime -> readable text
                 output['created_at'] = new_user.created_at.strftime(User.datetime_format)
                 output['updated_at'] = new_user.updated_at.strftime(User.datetime_format)
             else:
-                # FileStorage - note that the add method uses the dictionary
+                # FileStorage - note that the add method uses the dictionary 'output'
                 storage.add('User', output)
                 # timestamp -> readable text
                 output['created_at'] = datetime.fromtimestamp(new_user.created_at)
@@ -252,37 +250,32 @@ class User(Base):
             abort(400, "Not a JSON")
 
         data = request.get_json()
-        user_data = storage.get("User")
 
-        if user_id not in user_data:
-            abort(400, "User not found for id {}".format(user_id))
+        try:
+            # update the User record. Only first_name and last_name can be changed
+            result = storage.update('User', user_id, data, ["first_name", "last_name"])
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to update specified user!"
 
-        u = storage.get("User", user_id)
-
-        # modify the values
-        for k, v in data.items():
-            # only first_name and last_name are allowed to be modified
-            if k in ["first_name", "last_name"]:
-                u[k] = v
-
-        attribs = {
-            "id": u["id"],
-            "first_name": u["first_name"],
-            "last_name": u["last_name"],
-            "email": u["email"],
-            "created_at": u["created_at"],
-            "updated_at": u["updated_at"]
-        }
-
-        # update the User record with the new first_name and last_name
-        storage.update('User', user_id, attribs)
-
-        # print the Users out and you'll see the record has been updated
-        # print(storage.get('User'))
-
-        # update the created_at and updated_at to something readable before passing it out for display
-        attribs['created_at'] = datetime.fromtimestamp(u["created_at"])
-        attribs['updated_at'] = datetime.fromtimestamp(u["updated_at"])
+        if use_db_storage:
+            output = {
+                "id": result.id,
+                "first_name": result.first_name,
+                "last_name": result.last_name,
+                "email": result.email,
+                "created_at": result.created_at.strftime(User.datetime_format),
+                "updated_at": result.updated_at.strftime(User.datetime_format)
+            }
+        else:
+            output = {
+                "id": result["id"],
+                "first_name": result["first_name"],
+                "last_name": result["last_name"],
+                "email": result["email"],
+                "created_at": datetime.fromtimestamp(result["created_at"]),
+                "updated_at": datetime.fromtimestamp(result["updated_at"])
+            }
 
         # print out the updated user details
-        return jsonify(attribs)
+        return jsonify(output)
