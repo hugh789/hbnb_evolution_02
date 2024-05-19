@@ -11,6 +11,8 @@ from data import storage, use_db_storage, Base
 class User(Base):
     """Representation of user """
 
+    datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
+
     # Class attrib defaults
     id = None
     created_at = None
@@ -23,8 +25,8 @@ class User(Base):
     if use_db_storage:
         __tablename__ = 'users'
         id = Column(String(60), nullable=False, primary_key=True)
-        created_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
-        updated_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
+        created_at = Column(DateTime, nullable=False, default=datetime.now())
+        updated_at = Column(DateTime, nullable=False, default=datetime.now())
         __first_name = Column("first_name", String(128), nullable=True, default="")
         __last_name = Column("last_name", String(128), nullable=True, default="")
         __email = Column("email", String(128), nullable=False)
@@ -37,8 +39,11 @@ class User(Base):
         """ constructor """
         # Set object instance defaults
         self.id = str(uuid.uuid4())
-        self.created_at = datetime.now().timestamp()
-        self.updated_at = self.created_at
+
+        # Note that db records have a default of datetime.now()
+        if not use_db_storage:
+            self.created_at = datetime.now().timestamp()
+            self.updated_at = self.created_at
 
         # Only allow first_name, last_name, email, password.
         # Note that setattr will call the setters for these attribs
@@ -203,7 +208,7 @@ class User(Base):
             abort(400, "Missing password")
 
         try:
-            u = User(
+            new_user = User(
                 first_name=data["first_name"],
                 last_name=data["last_name"],
                 email=data["email"],
@@ -212,26 +217,33 @@ class User(Base):
         except ValueError as exc:
             return repr(exc) + "\n"
 
-        attribs = {
-            "id": u.id,
-            "first_name": u.first_name,
-            "last_name": u.last_name,
-            "email": u.email,
-            "created_at": u.created_at,
-            "updated_at": u.updated_at
+        output = {
+            "id": new_user.id,
+            "first_name": new_user.first_name,
+            "last_name": new_user.last_name,
+            "email": new_user.email,
+            "created_at": new_user.created_at,
+            "updated_at": new_user.updated_at
         }
 
-        # add to whatever is in storage at the moment
-        storage.add('User', attribs)
+        try:
+            if use_db_storage:
+                # DBStorage - note that the add method uses the User object instance
+                storage.add('User', new_user)
+                # datetime -> readable text
+                output['created_at'] = new_user.created_at.strftime(User.datetime_format)
+                output['updated_at'] = new_user.updated_at.strftime(User.datetime_format)
+            else:
+                # FileStorage - note that the add method uses the dictionary
+                storage.add('User', output)
+                # timestamp -> readable text
+                output['created_at'] = datetime.fromtimestamp(new_user.created_at)
+                output['updated_at'] = datetime.fromtimestamp(new_user.updated_at)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to add new User!"
 
-        # print the Users out and you'll see the new one has been added
-        # print(storage.get('User'))
-
-        # update the created_at and updated_at to something readable before passing it out for display
-        attribs['created_at'] = datetime.fromtimestamp(u.created_at)
-        attribs['updated_at'] = datetime.fromtimestamp(u.updated_at)
-
-        return jsonify(attribs)
+        return jsonify(output)
 
     @staticmethod
     def update(user_id):

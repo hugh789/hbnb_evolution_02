@@ -37,28 +37,21 @@ class FileStorage():
 
             return self.__data['models'][class_name][record_id]
 
-            
-
-
-
-    def add(self, class_name, data):
+    def add(self, class_name, new_record):
         """ Adds another entry to specified class """
 
-        if class_name in self.__classes:
-            # create if it doesn't exist
-            if class_name not in self.__data['models']:
-                self.__data['models'][class_name] = {}
-
-            # add to correct location
-            if data['id'] not in self.__data['models'][class_name]:
-                self.__data['models'][class_name][data['id']] = data
-            else:
-                raise IndexError("An item with the same id already exists")
-        else:
+        if class_name.strip() == "" or class_name not in self.__classes:
             raise IndexError("Specified class name is not valid")
 
-        if class_name == "" or class_name not in self.__data['models']:
-            raise IndexError("Model data does not have an. Specified class name not found")
+        # create if it doesn't exist
+        if class_name not in self.__data['models']:
+            self.__data['models'][class_name] = {}
+
+        if new_record['id'] in self.__data['models'][class_name]:
+            raise IndexError("An item with the same id already exists")
+
+        # add to existing data and return
+        self.__data['models'][class_name][new_record['id']] = new_record
 
     def update(self, class_name, record_id, data):
         """ Updates existing entry of specified class """

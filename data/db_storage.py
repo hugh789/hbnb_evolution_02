@@ -3,6 +3,7 @@
 
 import importlib
 from os import getenv
+from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -77,3 +78,15 @@ class DBStorage():
                 raise IndexError("Unable to load Model data. Specified id not found")
 
         return rows
+
+    def add(self, class_name, new_record):
+        """ Adds another record to specified class """
+
+        if class_name.strip() == "" or not self.__module_names[class_name]:
+            raise IndexError("Specified class name is not valid")
+
+        # Assume that the database table already exists so we're not doing CREATE TABLE here
+
+        self.__session.add(new_record)
+        self.__session.commit()
+        self.__session.refresh(new_record)
