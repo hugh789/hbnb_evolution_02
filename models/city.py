@@ -4,11 +4,11 @@ from datetime import datetime
 import uuid
 import re
 from flask import jsonify, request, abort
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from data import storage, use_db_storage, Base
 
-class City():
+class City(Base):
     """Representation of city """
 
     # Class attrib defaults
@@ -21,11 +21,11 @@ class City():
     if use_db_storage:
         __tablename__ = 'cities'
         id = Column(String(60), nullable=False, primary_key=True)
-        created_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
-        updated_at = Column(DateTime, nullable=False, default=datetime.now().timestamp())
+        created_at = Column(DateTime, nullable=False, default=datetime.now())
+        updated_at = Column(DateTime, nullable=False, default=datetime.now())
         __name = Column("name", String(128), nullable=False)
-        __country_id = Column("country", String(2), nullable=False)
-        country = relationship("Country", back_populates="cities")
+        __country_id = Column("country_id", String(128), ForeignKey('countries.id'), nullable=False)
+        country_relation = relationship("Country", back_populates="cities_relation")
 
     # constructor
     def __init__(self, *args, **kwargs):
