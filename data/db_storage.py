@@ -37,7 +37,11 @@ class DBStorage():
         if pwd is None:
             pwd = "hbnb_evo_pwd"
         if host is None:
-            host = "localhost"
+            if getenv('IS_DOCKER_CONTAINER'):
+                # make sure this is the same as the db container name in the docker compose file
+                host = "hbnb_evo_2_db"
+            else:
+                host = "localhost"
         if db is None:
             if is_testing == "1":
                 db = "hbnb_test_db"

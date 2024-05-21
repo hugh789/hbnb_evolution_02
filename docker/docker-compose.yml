@@ -5,6 +5,7 @@ services:
       MYSQL_DATABASE: hbnb_evo_db
       MYSQL_USER: hbnb_evo
       MYSQL_PASSWORD: hbnb_evo_pwd
+      MYSQL_ROOT_PASSWORD: password
     container_name: "hbnb_evo_2_db"
     restart: always
     ports:
@@ -12,10 +13,12 @@ services:
     networks:
       - private
   server:
+    image: "ubuntu:latest"
+    environment:
+      IS_DOCKER_CONTAINER: 1
     build:
       context: .
       dockerfile: Dockerfile
-    image: "ubuntu:latest"
     container_name: "hbnb_evo_2_server"
     restart: always
     ports:
