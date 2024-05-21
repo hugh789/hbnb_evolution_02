@@ -8,6 +8,6 @@ After you've copied the files to a location in your local computer, go to that f
 - docker-compose build
 - docker-compose up -d
 
-The Ubuntu container may fail at first... but it will automatically restart and then things will be ok after that.
+The Ubuntu container may fail at first... but it will automatically restart and then things will be ok after that. Things take a while to initialise. Give it a short while.
 
 You can then start testing your APIs using localhost:5000
