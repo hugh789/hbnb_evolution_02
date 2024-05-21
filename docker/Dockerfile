@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install -y pip
 RUN mkdir /home/Work && \
     cd /home/Work && \
-    git clone https://github.com/EverGreen1253/hbnb_evolution_01.git
+    git clone https://github.com/EverGreen1253/hbnb_evolution_02.git
 RUN pip install flask && \
     pip install gunicorn
 

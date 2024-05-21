@@ -1,4 +1,5 @@
 #!/usr/bin/python
+""" Country model """
 
 from datetime import datetime
 import uuid
@@ -6,7 +7,7 @@ import re
 from flask import jsonify, request, abort
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.orm import relationship
-from data import storage, use_db_storage, Base
+from data import storage, USE_DB_STORAGE, Base
 from models.city import City
 
 class Country(Base):
@@ -21,7 +22,7 @@ class Country(Base):
     __name = ""
     __code = ""
 
-    if use_db_storage:
+    if USE_DB_STORAGE:
         __tablename__ = 'countries'
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now())
@@ -37,7 +38,7 @@ class Country(Base):
         self.id = str(uuid.uuid4())
 
         # Note that db records have a default of datetime.now()
-        if not use_db_storage:
+        if not USE_DB_STORAGE:
             self.created_at = datetime.now().timestamp()
             self.updated_at = self.created_at
 
@@ -93,7 +94,7 @@ class Country(Base):
             print("Error: ", exc)
             return "Unable to load countries!"
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             for row in country_data:
                 data.append({
                     "id": row.id,
@@ -117,7 +118,7 @@ class Country(Base):
     @staticmethod
     def specific(country_code):
         """ Class method that returns a specific country's data"""
-        data = []
+        data = None
 
         try:
             country_data = storage.get('Country')
@@ -125,7 +126,7 @@ class Country(Base):
             print("Error: ", exc)
             return "Unable to load Country data!"
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             # Surely there must be a more optimised way to do this than using a for-loop right?
             # I mean it's ok now since there are only a few countries...
             # but what if there are a million countries in the future?
@@ -188,7 +189,7 @@ class Country(Base):
         # countries with the same code
 
         try:
-            if use_db_storage:
+            if USE_DB_STORAGE:
                 # DBStorage - note that the add method uses the Country object instance
                 storage.add('Country', new_country)
                 output['created_at'] = new_country.created_at.strftime(Country.datetime_format)
@@ -222,7 +223,7 @@ class Country(Base):
         # Surely there's a better way to search for the country id?
 
         country_id = ""
-        if use_db_storage:
+        if USE_DB_STORAGE:
             for row in country_data:
                 if row.code == country_code:
                     country_id = row.id
@@ -241,7 +242,7 @@ class Country(Base):
             print("Error: ", exc)
             return "Unable to update specified country!"
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             output = {
                 "id": result.id,
                 "name": result.name,
@@ -269,7 +270,7 @@ class Country(Base):
         country_data = storage.get("Country")
         city_data = storage.get("City")
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             # Once again, we have unoptimised code for DB Storage.
             # Surely there is a better way to do this?
 

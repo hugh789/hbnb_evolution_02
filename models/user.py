@@ -1,12 +1,12 @@
 #!/usr/bin/python
+""" User model """
 
 from datetime import datetime
 import uuid
 import re
-import json
 from flask import jsonify, request, abort
 from sqlalchemy import Column, String, DateTime
-from data import storage, use_db_storage, Base
+from data import storage, USE_DB_STORAGE, Base
 
 class User(Base):
     """Representation of user """
@@ -22,7 +22,7 @@ class User(Base):
     __email = ""
     __password = ""
 
-    if use_db_storage:
+    if USE_DB_STORAGE:
         __tablename__ = 'users'
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now())
@@ -41,7 +41,7 @@ class User(Base):
         self.id = str(uuid.uuid4())
 
         # Note that db records have a default of datetime.now()
-        if not use_db_storage:
+        if not USE_DB_STORAGE:
             self.created_at = datetime.now().timestamp()
             self.updated_at = self.created_at
 
@@ -129,7 +129,7 @@ class User(Base):
             print("Error: ", exc)
             return "Unable to load users!"
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             # DBStorage
             for row in user_data:
                 # use print(row.__dict__) to see the contents of the sqlalchemy model objects
@@ -168,7 +168,7 @@ class User(Base):
             print("Error: ", exc)
             return "User not found!"
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             # DBStorage
             data.append({
                 "id": user_data.id,
@@ -228,7 +228,7 @@ class User(Base):
         }
 
         try:
-            if use_db_storage:
+            if USE_DB_STORAGE:
                 # DBStorage - note that the add method uses the User object instance 'new_user'
                 storage.add('User', new_user)
                 # datetime -> readable text
@@ -261,7 +261,7 @@ class User(Base):
             print("Error: ", exc)
             return "Unable to update specified user!"
 
-        if use_db_storage:
+        if USE_DB_STORAGE:
             output = {
                 "id": result.id,
                 "first_name": result.first_name,

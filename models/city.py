@@ -1,12 +1,12 @@
 #!/usr/bin/python
+""" City model """
 
 from datetime import datetime
 import uuid
 import re
-from flask import jsonify, request, abort
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from data import storage, use_db_storage, Base
+from data import storage, USE_DB_STORAGE, Base
 
 class City(Base):
     """Representation of city """
@@ -18,7 +18,7 @@ class City(Base):
     __name = ""
     __country_id = ""
 
-    if use_db_storage:
+    if USE_DB_STORAGE:
         __tablename__ = 'cities'
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now())
@@ -66,9 +66,8 @@ class City(Base):
     @country_id.setter
     def country_id(self, value):
         """Setter for private prop country_id"""
-
         # ensure that the specified country id actually exists before setting
-        if country_data.get(value) is not None:
+        if storage.get('Country', value) is not None:
             self.__country_id = value
         else:
             raise ValueError("Invalid country_id specified: {}".format(value))

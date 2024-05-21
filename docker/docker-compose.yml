@@ -1,0 +1,29 @@
+services:
+  db:
+    image: "mysql:8.0.37"
+    environment:
+      MYSQL_DATABASE: hbnb_evo_db
+      MYSQL_USER: hbnb_evo
+      MYSQL_PASSWORD: hbnb_evo_pwd
+    container_name: "hbnb_evo_2_db"
+    restart: always
+    ports:
+      - "3306:3306"
+    networks:
+      - private
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "ubuntu:latest"
+    container_name: "hbnb_evo_2_server"
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - private
+    depends_on:
+      - db
+
+networks:
+  private:
