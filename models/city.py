@@ -32,8 +32,11 @@ class City(Base):
         """ constructor """
         # Set object instance defaults
         self.id = str(uuid.uuid4())
-        self.created_at = datetime.now().timestamp()
-        self.updated_at = self.created_at
+
+        # Note that db records have a default of datetime.now()
+        if not USE_DB_STORAGE:
+            self.created_at = datetime.now().timestamp()
+            self.updated_at = self.created_at
 
         # Only allow country_id, name.
         # Note that setattr will call the setters for these 2 attribs
