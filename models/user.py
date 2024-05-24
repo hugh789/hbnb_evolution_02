@@ -31,8 +31,8 @@ class User(Base):
         __last_name = Column("last_name", String(128), nullable=True, default="")
         __email = Column("email", String(128), nullable=False)
         __password = Column("password", String(128), nullable=False)
-        # places = relationship("Place", back_populates="user",cascade="delete, delete-orphan")
-        # reviews = relationship("Review", back_populates="user",cascade="delete, delete-orphan")
+        # places = relationship("Place", back_populates="user", cascade="delete, delete-orphan")
+        # reviews = relationship("Review", back_populates="user", cascade="delete, delete-orphan")
 
     # Constructor
     def __init__(self, *args, **kwargs):
