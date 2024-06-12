@@ -17,6 +17,27 @@ def hello_world_post():
     # curl -X POST localhost:5000/
     return "hello world\n"
 
+# Examples
+@app.route('/example/places_amenities', methods=["GET"])
+def places_amenities_get():
+    """ gives any example of how to use relationships to access data """
+    # NOTE: This example will only work with the data in the DB
+    from data import storage, USE_DB_STORAGE
+    from models.place import Place
+
+    place_amenities = {}
+    amenities_list = []
+    if USE_DB_STORAGE:
+        place_id = "71bebd9b-481b-4bf0-bb83-4e30ea66bdaa"
+        specific_place = storage.get('Place', place_id)
+
+        for item in specific_place.amenities:
+            amenities_list.append(item.name)
+
+        place_amenities[specific_place.name] = amenities_list
+
+    return place_amenities
+
 
 # --- API endpoints ---
 # --- USER ---
