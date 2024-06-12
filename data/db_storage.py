@@ -16,8 +16,8 @@ class DBStorage():
         "User": "user",
         "Country": "country",
         "City": "city",
-        "Amenity": "amenity",
-        "Place": "place",
+        "Amenity": "place_amenity",
+        "Place": "place_amenity",
         "Review": "review"
     }
 

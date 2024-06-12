@@ -23,7 +23,7 @@ def places_amenities_get():
     """ gives any example of how to use relationships to access data """
     # NOTE: This example will only work with the data in the DB
     from data import storage, USE_DB_STORAGE
-    from models.place import Place
+    from models.place_amenity import Place
 
     place_amenities = {}
     amenities_list = []
@@ -37,6 +37,26 @@ def places_amenities_get():
         place_amenities[specific_place.name] = amenities_list
 
     return place_amenities
+
+@app.route('/example/amenities_places', methods=["GET"])
+def amenities_places_get():
+    """ gives any example of how to use relationships to access data """
+    # NOTE: This example will only work with the data in the DB
+    from data import storage, USE_DB_STORAGE
+    from models.place_amenity import Amenity
+
+    amenity_places = {}
+    places_list = []
+    if USE_DB_STORAGE:
+        amenity_id = "2ec8cf22-e5ea-4a1f-aedd-89f15fcc60e9"
+        specific_amenity = storage.get('Amenity', amenity_id)
+
+        for item in specific_amenity.places:
+            places_list.append(item.name)
+
+        amenity_places[specific_amenity.name] = places_list
+
+    return amenity_places
 
 
 # --- API endpoints ---

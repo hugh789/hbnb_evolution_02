@@ -9,8 +9,7 @@ The code you are seeing is something I have written using my own style. You may 
 1. For now, ignore all the stuff in the project description about running separate Docker containers for the database. You should already have MySQL installed in your work environment. Let's just use that for now.
 2. Once again, the code is not perfect. In fact, I've left a few things inside that could be optimised.
 3. Look at the endpoints in app.py and see how they've all changed compared to Part 01.
-4. Look at the __init__.py in the data folder to see what changes I've made. Also take a look at the one in the models folder as well.
+4. Look at the __init__.py in the data folder to see what changes I've made.
 5. The model classes have been modified extensively to make them work well with either File Storage or DB Storage. BUT! A lot of the methods contain unoptimised code! Is there something we can do about it?
 6. You may all see a lot of lines the model files that I have commented out. What are all these relationship things? There is a working example API in app.py that shows how to use relationships to extract data from the Places-Amenities many-to-many relationship.
-7. Note that there is one line in the Amenity model that is commented out. Uncommenting it will cause a circular import error (like chicken and egg scenario I mentioned before). There is a way to solve it so that Places and Amenities can call each others relationships without problems... what could it be???
 7. As before, let's play a game of 'Fill in the Blanks'. Challenge yourself to optimise what you see as well as complete the incomplete code to add back what's missing.

@@ -8,10 +8,21 @@ from flask import jsonify, request, abort
 from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from data import storage, USE_DB_STORAGE, Base
-from models import place_amenity
-from models.amenity import Amenity
 
-# Even though it seems that Amenity is not used, you have to import it due to the many-to-many relationship
+# This is unfortunately the best possible way to have the many-to-many relationship work both ways.
+# If the two classes are split into separate files, you'll have to import the other class
+# to make things work, and this would cause a circular import error (chicken and egg problem).
+
+
+if USE_DB_STORAGE:
+    # define the many-to-many table
+    place_amenity = Table(
+        'place_amenity',
+        Base.metadata,
+        Column('place_id', String(60), ForeignKey('places.id'), primary_key=True),
+        Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True)
+    )
+
 
 class Place(Base):
     """Representation of place """
@@ -202,6 +213,58 @@ class Place(Base):
             self.__longitude = value
         else:
             raise ValueError("Invalid value specified for Longitude: {}".format(value))
+
+    # --- Static methods ---
+    # TODO:
+
+
+class Amenity(Base):
+    """Representation of amenity """
+
+    datetime_format = "%Y-%m-%dT%H:%M:%S.%f"
+
+    # Class attrib defaults
+    id = None
+    created_at = None
+    updated_at = None
+    __name = ""
+
+    # Class attrib defaults
+    __tablename__ = 'amenities'
+    id = Column(String(60), nullable=False, primary_key=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    updated_at = Column(DateTime, nullable=False, default=datetime.now())
+    __name = Column("name", String(128), nullable=False)
+    places = relationship("Place", secondary=place_amenity, back_populates = 'amenities')
+
+    # constructor
+    def __init__(self, *args, **kwargs):
+        """ constructor """
+        # Set object instance defaults
+        self.id = str(uuid.uuid4())
+
+        # Note that setattr will call the setters for attribs in the list
+        if kwargs:
+            for key, value in kwargs.items():
+                if key in ["name"]:
+                    setattr(self, key, value)
+
+    # --- Getters and Setters ---
+    @property
+    def name(self):
+        """Getter for private prop name"""
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        """Setter for private prop name"""
+
+        # ensure that the value is not spaces-only and is alphabets + spaces only
+        is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z ]+$", value)
+        if is_valid_name:
+            self.__name = value
+        else:
+            raise ValueError("Invalid amenity name specified: {}".format(value))
 
     # --- Static methods ---
     # TODO:

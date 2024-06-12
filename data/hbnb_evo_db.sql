@@ -121,33 +121,6 @@ INSERT INTO `place_amenity` VALUES ('71bebd9b-481b-4bf0-bb83-4e30ea66bdaa','036b
 /*!40000 ALTER TABLE `place_amenity` ENABLE KEYS */;
 
 --
--- Table structure for table `place_amenity_old`
---
-
-DROP TABLE IF EXISTS `place_amenity_old`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `place_amenity_old` (
-  `id` varchar(60) NOT NULL,
-  `place_id` varchar(60) NOT NULL,
-  `amenity_id` varchar(60) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `place_id` (`place_id`),
-  KEY `amenity_id` (`amenity_id`),
-  CONSTRAINT `place_amenity_old_ibfk_1` FOREIGN KEY (`place_id`) REFERENCES `places` (`id`),
-  CONSTRAINT `place_amenity_old_ibfk_2` FOREIGN KEY (`amenity_id`) REFERENCES `amenities` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `place_amenity_old`
---
-
-/*!40000 ALTER TABLE `place_amenity_old` DISABLE KEYS */;
-INSERT INTO `place_amenity_old` VALUES ('1','821d0c3e-d08a-407b-b8bc-813eaf619595','036bc824-74ed-44dc-a183-1ab6c4878fc2'),('10','7b214bfd-923e-42c6-ae00-a985cb6ecfd9','544cd593-7475-494d-ba3a-b5ec66b3945d'),('11','47236378-e16a-4a2b-91b4-5dab12ec98e7','3ca936e3-8a1e-4313-8308-9c94d5918437'),('2','821d0c3e-d08a-407b-b8bc-813eaf619595','2ec8cf22-e5ea-4a1f-aedd-89f15fcc60e9'),('3','821d0c3e-d08a-407b-b8bc-813eaf619595','83874c62-1902-4572-b76a-5cffb7a08a91'),('4','71bebd9b-481b-4bf0-bb83-4e30ea66bdaa','036bc824-74ed-44dc-a183-1ab6c4878fc2'),('5','71bebd9b-481b-4bf0-bb83-4e30ea66bdaa','2ec8cf22-e5ea-4a1f-aedd-89f15fcc60e9'),('6','71bebd9b-481b-4bf0-bb83-4e30ea66bdaa','3ca936e3-8a1e-4313-8308-9c94d5918437'),('7','71bebd9b-481b-4bf0-bb83-4e30ea66bdaa','544cd593-7475-494d-ba3a-b5ec66b3945d'),('8','71bebd9b-481b-4bf0-bb83-4e30ea66bdaa','83874c62-1902-4572-b76a-5cffb7a08a91'),('9','7b214bfd-923e-42c6-ae00-a985cb6ecfd9','2ec8cf22-e5ea-4a1f-aedd-89f15fcc60e9');
-/*!40000 ALTER TABLE `place_amenity_old` ENABLE KEYS */;
-
---
 -- Table structure for table `places`
 --
 
@@ -255,4 +228,4 @@ INSERT INTO `users` VALUES ('2dd927b2-9503-4918-a48e-2608859cc49f','2024-05-24 1
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-12 14:41:13
+-- Dump completed on 2024-06-12 16:04:39
