@@ -67,11 +67,10 @@ def malaysia_cities_get():
 
     # Output is equivalent to http://localhost:5000/api/v1/countries/MY/cities
 
+    data = []
     if USE_DB_STORAGE:
         country_id = "db63e499-f604-41a3-b97a-ee4bf9331f75"
         result = storage.get('Country', country_id)
-
-        data = []
 
         # Note the use of the cities relationship
         city_data = result.cities
@@ -83,13 +82,15 @@ def malaysia_cities_get():
                 "created_at":v.created_at.strftime(Country.datetime_format),
                 "updated_at":v.updated_at.strftime(Country.datetime_format)
             })
-        return data
+
+    return data
 
 @app.route('/example/kuala_lumpur_parent_country')
 def kl_parent_country_get():
     """ Example to show how to get country data for a city using relationships """
     from data import storage, USE_DB_STORAGE
 
+    output = ""
     if USE_DB_STORAGE:
         city_id = "68c06ef5-bf33-46df-a894-9ac54f728f43"
         city_obj = storage.get('City', city_id)
@@ -97,7 +98,9 @@ def kl_parent_country_get():
         # Note the use of the country relationship
         country = city_obj.country
 
-        return city_obj.name + ' is a city in ' + country.name + '!!'
+        output = city_obj.name + ' is a city in ' + country.name + '!!'
+
+    return output
 
 
 # --- API endpoints ---
