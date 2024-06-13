@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
-from flask import Flask
+from flask import Flask, jsonify
 from models.country import Country
 from models.user import User
+from data import USE_DB_STORAGE
 
 app = Flask(__name__)
 
@@ -17,8 +18,9 @@ def hello_world_post():
     # curl -X POST localhost:5000/
     return "hello world\n"
 
-# Examples
-@app.route('/example/places_amenities', methods=["GET"])
+# Examples - These will only work with DB Storage!
+# We're using the power of relationships to grab the data we need!
+@app.route('/example/places_amenities')
 def places_amenities_get():
     """ gives any example of how to use relationships to access data """
     # NOTE: This example will only work with the data in the DB
@@ -38,7 +40,7 @@ def places_amenities_get():
 
     return place_amenities
 
-@app.route('/example/amenities_places', methods=["GET"])
+@app.route('/example/amenities_places')
 def amenities_places_get():
     """ gives any example of how to use relationships to access data """
     # NOTE: This example will only work with the data in the DB
@@ -57,6 +59,45 @@ def amenities_places_get():
         amenity_places[specific_amenity.name] = places_list
 
     return amenity_places
+
+@app.route('/example/malaysia_cities')
+def malaysia_cities_get():
+    """ Example to show how to get cities data for a country using relationships """
+    from data import storage, USE_DB_STORAGE
+
+    # Output is equivalent to http://localhost:5000/api/v1/countries/MY/cities
+
+    if USE_DB_STORAGE:
+        country_id = "db63e499-f604-41a3-b97a-ee4bf9331f75"
+        result = storage.get('Country', country_id)
+
+        data = []
+
+        # Note the use of the cities relationship
+        city_data = result.cities
+        for v in city_data:
+            data.append({
+                "id": v.id,
+                "name": v.name,
+                "country_id": v.country_id,
+                "created_at":v.created_at.strftime(Country.datetime_format),
+                "updated_at":v.updated_at.strftime(Country.datetime_format)
+            })
+        return data
+
+@app.route('/example/kuala_lumpur_parent_country')
+def kl_parent_country_get():
+    """ Example to show how to get country data for a city using relationships """
+    from data import storage, USE_DB_STORAGE
+
+    if USE_DB_STORAGE:
+        city_id = "68c06ef5-bf33-46df-a894-9ac54f728f43"
+        city_obj = storage.get('City', city_id)
+
+        # Note the use of the country relationship
+        country = city_obj.country
+
+        return city_obj.name + ' is a city in ' + country.name + '!!'
 
 
 # --- API endpoints ---
@@ -132,7 +173,7 @@ def countries_put(country_code):
 @app.route('/api/v1/countries/<country_code>/cities', methods=["GET"])
 def countries_specific_cities_get(country_code):
     """ returns cities data of specified country """
-    return Country.cities(country_code)
+    return Country.cities_data(country_code)
 
 # Create the rest of the endpoints for:
 #  - City

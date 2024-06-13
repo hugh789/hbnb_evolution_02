@@ -29,7 +29,7 @@ class Country(Base):
         updated_at = Column(DateTime, nullable=False, default=datetime.now())
         __name = Column("name", String(128), nullable=False)
         __code = Column("code", String(2), nullable=False)
-        # cities = relationship("City", back_populates="country", cascade="delete, delete-orphan")
+        cities = relationship("City", back_populates="country", cascade="delete, delete-orphan")
 
     # Constructor
     def __init__(self, *args, **kwargs):
@@ -262,7 +262,7 @@ class Country(Base):
         return jsonify(output)
 
     @staticmethod
-    def cities(country_code):
+    def cities_data(country_code):
         """ Class method that returns a specific country's cities"""
         data = []
         wanted_country_id = ""
@@ -272,7 +272,7 @@ class Country(Base):
 
         if USE_DB_STORAGE:
             # Once again, we have unoptimised code for DB Storage.
-            # Surely there is a better way to do this?
+            # Surely there is a better way to do this? Maybe using relationships?
 
             for row in country_data:
                 if row.code == country_code:
