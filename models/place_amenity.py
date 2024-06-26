@@ -62,8 +62,8 @@ class Place(Base):
         __latitude = Column("latitude", Float, nullable=True)
         __longitude = Column("longitude", Float, nullable=True)
         amenities = relationship("Amenity", secondary=place_amenity, back_populates = 'places')
-        # reviews = relationship("Review", back_populates="place")
-        # owner = relationship("User", back_populates="properties")
+        reviews = relationship("Review", back_populates="place", cascade="delete, delete-orphan")
+        owner = relationship("User", back_populates="properties")
 
     # Constructor
     def __init__(self, *args, **kwargs):
@@ -215,7 +215,244 @@ class Place(Base):
             raise ValueError("Invalid value specified for Longitude: {}".format(value))
 
     # --- Static methods ---
-    # TODO:
+
+    @staticmethod
+    def all():
+        """ Class method that returns all place data"""
+        data = []
+
+        try:
+            place_data = storage.get('Place')
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to load places!"
+
+        if USE_DB_STORAGE:
+            # DBStorage
+            for row in place_data:
+                # use print(row.__dict__) to see the contents of the sqlalchemy model objects
+                data.append({
+                    "id": row.id,
+                    "host_user_id": row.host_user_id,
+                    "city_id": row.city_id,
+                    "name": row.name,
+                    "description": row.description,
+                    "address": row.address,
+                    "latitude": row.latitude,
+                    "longitude": row.longitude,
+                    "number_of_rooms": row.number_of_rooms,
+                    "bathrooms": row.bathrooms,
+                    "price_per_night": row.price_per_night,
+                    "max_guests": row.max_guests,
+                    "created_at": row.created_at.strftime(Place.datetime_format),
+                    "updated_at": row.updated_at.strftime(Place.datetime_format)
+                })
+        else:
+            # FileStorage
+            for k, v in place_data.items():
+                data.append({
+                    "id": v['id'],
+                    "host_user_id": v['host_user_id'],
+                    "city_id": v['city_id'],
+                    "name": v['name'],
+                    "description": v['description'],
+                    "address": v['address'],
+                    "latitude": v['latitude'],
+                    "longitude": v['longitude'],
+                    "number_of_rooms": v['number_of_rooms'],
+                    "bathrooms": v['bathrooms'],
+                    "price_per_night": v['price_per_night'],
+                    "max_guests": v['max_guests'],
+                    "created_at": datetime.fromtimestamp(v['created_at']),
+                    "updated_at": datetime.fromtimestamp(v['updated_at'])
+                })
+
+        return jsonify(data)
+
+    @staticmethod
+    def specific(place_id):
+        """ Class method that returns a specific place's data"""
+        data = []
+
+        try:
+            place_data = storage.get('Place', place_id)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Place not found!"
+
+        if USE_DB_STORAGE:
+            # DBStorage
+            data.append({
+                "id": place_data.id,
+                "host_user_id": place_data.host_user_id,
+                "city_id": place_data.city_id,
+                "name": place_data.name,
+                "description": place_data.description,
+                "address": place_data.address,
+                "latitude": place_data.latitude,
+                "longitude": place_data.longitude,
+                "number_of_rooms": place_data.number_of_rooms,
+                "bathrooms": place_data.bathrooms,
+                "price_per_night": place_data.price_per_night,
+                "max_guests": place_data.max_guests,
+                "created_at": place_data.created_at.strftime(Place.datetime_format),
+                "updated_at": place_data.updated_at.strftime(Place.datetime_format)
+            })
+        else:
+            # FileStorage
+            data.append({
+                "id": place_data['id'],
+                "host_user_id": place_data['host_user_id'],
+                "city_id": place_data['city_id'],
+                "name": place_data['name'],
+                "description": place_data['description'],
+                "address": place_data['address'],
+                "latitude": place_data['latitude'],
+                "longitude": place_data['longitude'],
+                "number_of_rooms": place_data['number_of_rooms'],
+                "bathrooms": place_data['bathrooms'],
+                "price_per_night": place_data['price_per_night'],
+                "max_guests": place_data['max_guests'],
+                "created_at": datetime.fromtimestamp(place_data['created_at']),
+                "updated_at": datetime.fromtimestamp(place_data['updated_at'])
+                })
+
+        return jsonify(data)
+
+    @staticmethod
+    def create():
+        """ Class method that creates a new Place"""
+        if request.get_json() is None:
+            abort(400, "Not a JSON")
+
+        data = request.get_json()
+        for key in ["host_user_id", "city_id", "name", "description", "address",
+                "latitude", "longitude", "number_of_rooms", "bathrooms",
+                "price_per_night", "max_guests"]:
+            if key not in data:
+                abort(400, "Missing {}".format(key))
+
+        try:
+            new_place = Place(
+                host_user_id=data["host_user_id"],
+                city_id=data["city_id"],
+                name=data["name"],
+                description=data["description"],
+                address=data["address"],
+                latitude=data["latitude"],
+                longitude=data["longitude"],
+                number_of_rooms=data["number_of_rooms"],
+                bathrooms=data["bathrooms"],
+                price_per_night=data["price_per_night"],
+                max_guests=data["max_guests"],
+            )
+        except ValueError as exc:
+            return repr(exc) + "\n"
+
+        output = {
+            "id": new_place.id,
+            "host_user_id": new_place.host_user_id,
+            "city_id": new_place.city_id,
+            "name": new_place.name,
+            "description": new_place.description,
+            "address": new_place.address,
+            "latitude": new_place.latitude,
+            "longitude": new_place.longitude,
+            "number_of_rooms": new_place.number_of_rooms,
+            "bathrooms": new_place.bathrooms,
+            "price_per_night": new_place.price_per_night,
+            "max_guests": new_place.max_guests,
+            "created_at": new_place.created_at,
+            "updated_at": new_place.updated_at
+        }
+
+        try:
+            if USE_DB_STORAGE:
+                # DBStorage - note that the add method uses the Place object instance 'new_place'
+                storage.add('Place', new_place)
+                # datetime -> readable text
+                output['created_at'] = new_place.created_at.strftime(Place.datetime_format)
+                output['updated_at'] = new_place.updated_at.strftime(Place.datetime_format)
+            else:
+                # FileStorage - note that the add method uses the dictionary 'output'
+                storage.add('Place', output)
+                # timestamp -> readable text
+                output['created_at'] = datetime.fromtimestamp(new_place.created_at)
+                output['updated_at'] = datetime.fromtimestamp(new_place.updated_at)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to add new Place!"
+
+        return jsonify(output)
+
+    @staticmethod
+    def update(place_id):
+        """ Class method that updates an existing Place"""
+        if request.get_json() is None:
+            abort(400, "Not a JSON")
+
+        data = request.get_json()
+
+        try:
+            # update the Place record. All attributes except id, created & updated are allowed to be modified
+            result = storage.update('Place', place_id, data,
+                                    ["name", "host_user_id", "city_id","description", "address",
+                                     "latitude", "longitude", "number_of_rooms", "bathrooms",
+                                     "price_per_night", "max_guests"])
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to update specified place!"
+
+        if USE_DB_STORAGE:
+            output = {
+                "id": result.id,
+                "host_user_id": result.host_user_id,
+                "city_id": result.city_id,
+                "name": result.name,
+                "description": result.description,
+                "address": result.address,
+                "latitude": result.latitude,
+                "longitude": result.longitude,
+                "number_of_rooms": result.number_of_rooms,
+                "bathrooms": result.bathrooms,
+                "price_per_night": result.price_per_night,
+                "max_guests": result.max_guests,
+                "created_at": result.created_at.strftime(Place.datetime_format),
+                "updated_at": result.updated_at.strftime(Place.datetime_format)
+            }
+        else:
+            output = {
+                "id": result["id"],
+                "host_user_id": result["host_user_id"],
+                "city_id": result["city_id"],
+                "name": result["name"],
+                "description": result["description"],
+                "address": result["address"],
+                "latitude": result["latitude"],
+                "longitude": result["longitude"],
+                "number_of_rooms": result["number_of_rooms"],
+                "bathrooms": result["bathrooms"],
+                "price_per_night": result["price_per_night"],
+                "max_guests": result["max_guests"],
+                "created_at": datetime.fromtimestamp(result["created_at"]),
+                "updated_at": datetime.fromtimestamp(result["updated_at"])
+            }
+
+        # print out the updated user details
+        return jsonify(output)
+
+    @staticmethod
+    def delete(place_id):
+        """ Class method that deletes an existing Place"""
+        try:
+            # delete the Place record
+            storage.delete('Place', place_id)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to delete specified Place!"
+
+        return Place.all()
+
 
 
 class Amenity(Base):
@@ -230,12 +467,13 @@ class Amenity(Base):
     __name = ""
 
     # Class attrib defaults
-    __tablename__ = 'amenities'
-    id = Column(String(60), nullable=False, primary_key=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.now())
-    updated_at = Column(DateTime, nullable=False, default=datetime.now())
-    __name = Column("name", String(128), nullable=False)
-    places = relationship("Place", secondary=place_amenity, back_populates = 'amenities')
+    if USE_DB_STORAGE:
+        __tablename__ = 'amenities'
+        id = Column(String(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False, default=datetime.now())
+        updated_at = Column(DateTime, nullable=False, default=datetime.now())
+        __name = Column("name", String(128), nullable=False)
+        places = relationship("Place", secondary=place_amenity, back_populates='amenities')
 
     # constructor
     def __init__(self, *args, **kwargs):
@@ -267,4 +505,145 @@ class Amenity(Base):
             raise ValueError("Invalid amenity name specified: {}".format(value))
 
     # --- Static methods ---
-    # TODO:
+    @staticmethod
+    def all():
+        """ Class method that returns all amenity data"""
+        data = []
+
+        try:
+            amenity_data = storage.get('Amenity')
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to load amenities!"
+
+        if USE_DB_STORAGE:
+            for row in amenity_data:
+                data.append({
+                    "id": row.id,
+                    "name": row.name,
+                    "created_at": row.created_at.strftime(Amenity.datetime_format),
+                    "updated_at": row.updated_at.strftime(Amenity.datetime_format)
+                })
+        else:
+            for k, v in amenity_data.items():
+                data.append({
+                    "id": v['id'],
+                    "name": v['name'],
+                    "created_at": datetime.fromtimestamp(v['created_at']),
+                    "updated_at": datetime.fromtimestamp(v['updated_at'])
+                })
+
+        return jsonify(data)
+
+    @staticmethod
+    def specific(amenity_id):
+        """ Class method that returns a specific amenities' data"""
+        data = []
+
+        try:
+            amenity_data = storage.get('Amenity', amenity_id)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to load Amenity data!"
+
+        if USE_DB_STORAGE:
+            data.append({
+                "id": amenity_data.id,
+                "name": amenity_data.name,
+                "created_at": amenity_data.created_at.strftime(Amenity.datetime_format),
+                "updated_at": amenity_data.updated_at.strftime(Amenity.datetime_format)
+                })
+        else:
+            data.append({
+                "id": amenity_data['id'],
+                "name": amenity_data['name'],
+                "created_at": datetime.fromtimestamp(amenity_data['created_at']),
+                "updated_at": datetime.fromtimestamp(amenity_data['updated_at'])
+                })
+
+        return jsonify(data)
+
+    @staticmethod
+    def create():
+        """ Class method that creates a new amenity"""
+        if request.get_json() is None:
+            abort(400, "Not a JSON")
+
+        data = request.get_json()
+        if 'name' not in data:
+            abort(400, "Missing name")
+
+        ###### TO DO ##### ONLY UNIQUE NAME FOR AMENITY
+
+        try:
+            new_amenity = Amenity(
+                name=data["name"],
+            )
+        except ValueError as exc:
+            return repr(exc) + "\n"
+
+        try:
+            if USE_DB_STORAGE:
+                # DBStorage - note that the add method uses the Amenity object instance
+                storage.add('Amenity', new_amenity)
+            else:
+                # FileStorage - note that the add method uses the dictionary 'output'
+                output = {
+                    "id": new_amenity.id,
+                    "name": new_amenity.name,
+                    "created_at": new_amenity.created_at,
+                    "updated_at": new_amenity.updated_at
+                    }
+                storage.add('Amenity', output)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to add new Amenity!"
+
+        try:
+            return Amenity.specific(new_amenity.id)
+        except IndexError:
+            return "New Amenity not stored correctly"
+
+    @staticmethod
+    def update(amenity_id):
+        """ Class method that updates an existing Amenity"""
+        if request.get_json() is None:
+            abort(400, "Not a JSON")
+
+        data = request.get_json()
+
+        try:
+            # update the Amenity record. Only name can be changed
+            result = storage.update('Amenity', amenity_id, data, ["name"])
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to update specified Amenity!"
+
+        if USE_DB_STORAGE:
+            output = {
+                "id": result.id,
+                "name": result.name,
+                "created_at": result.created_at.strftime(Amenity.datetime_format),
+                "updated_at": result.updated_at.strftime(Amenity.datetime_format)
+                }
+        else:
+            output = {
+                "id": result['id'],
+                "name": result['name'],
+                "created_at": datetime.fromtimestamp(result['created_at']),
+                "updated_at": datetime.fromtimestamp(result['updated_at'])
+                }
+
+        return jsonify(output)
+
+    @staticmethod
+    def delete(amenity_id):
+        """ Class method that deletes an existing Amenity"""
+        try:
+            # delete an Amenity
+            storage.delete('Amenity', amenity_id)
+        except IndexError as exc:
+            print("Error: ", exc)
+            return "Unable to delete specified Amenity!"
+
+        return Amenity.all()
