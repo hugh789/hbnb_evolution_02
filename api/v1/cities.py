@@ -1,3 +1,4 @@
+
 """ objects that handles all default RestFul API actions for City """
 from api.v1 import api_routes
 from models.city import City
@@ -44,3 +45,8 @@ def cities_specific_country_get(city_id):
         "updated_at":c.updated_at.strftime(City.datetime_format)
     })
     return data
+
+@api_routes.route('/cities/<city_id>', methods=["DELETE"])
+def cities_delete(city_id):
+    """ deletes existing city data using specified id """
+    return City.delete(city_id)
