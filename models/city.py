@@ -231,15 +231,3 @@ class City(Base):
         
         #print out the updated user details
         return jsonify(output)
-
-    @staticmethod
-    def delete(city_id):
-        """ Class method that deletes an existing City"""
-        try:
-            # delete the City record
-            storage.delete('City', city_id)
-        except IndexError as exc:
-            print("Error: ", exc)
-            return "Unable to delete specified city!"
-        
-       return City.all()
