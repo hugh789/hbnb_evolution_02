@@ -26,13 +26,13 @@ class Review(Base):
 
 
     if USE_DB_STORAGE:
-        __tablename__ = 'review'
+        __tablename__ = 'reviews'
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now())
         updated_at = Column(DateTime, nullable=False, default=datetime.now())
-        __feedback = Column("feedback", String(128), nullable=False)
+        __feedback = Column("comment", String(128), nullable=False)
         __rating = Column("rating", Integer, nullable=False, default=0)
-        __commentor_user_id = Column("commentor_user_id", String(128), ForeignKey("users.id"), nullable=False)
+        __commentor_user_id = Column("user_id", String(128), ForeignKey("users.id"), nullable=False)
         __place_id = Column("place_id", String(128), ForeignKey('places.id'), nullable=False)
         place = relationship("Place", back_populates="reviews")
         writer = relationship("User", back_populates="reviews")
@@ -65,7 +65,7 @@ class Review(Base):
         """Setter for private prop feedback"""
 
         # ensure that the value is not spaces-only and is alphabets + spaces only
-        is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z ]+$", value)
+        is_valid_name = len(value.strip()) > 0 and re.search("^[a-zA-Z0-9, ]+$", value)
         if is_valid_name:
             self.__feedback = value
         else:
@@ -251,8 +251,9 @@ class Review(Base):
         data = request.get_json()
 
         try:
-            # update the Review record. Only name and country_id are allowed to be modified
-            result = storage.update('City', review_id, data, ["commentor_user_id", "place_id", "feedback", "rating"])
+            # update the Review record. Only "commentor_user_id", "place_id", "feedback", "rating" can be updated.
+            result = storage.update('Review', review_id, data, ["place_id", "commentor_user_id", "feedback", "rating"])
+
         except IndexError as exc:
             print("Error: ", exc)
             return "Unable to update specified Review!"

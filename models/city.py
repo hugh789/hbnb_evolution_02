@@ -180,7 +180,7 @@ class City(Base):
 
         try:
             if USE_DB_STORAGE:
-                storage>add('City', new_city)
+                storage.add('City', new_city)
                 #datetime -> readable text
                 output['created_at'] = new_city.created_at.strftime(City.datetime_format)
                 output['updated_at'] = new_city.updated_at.strftime(City.datetime_format)
