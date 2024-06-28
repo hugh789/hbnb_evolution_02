@@ -205,8 +205,8 @@ class City(Base):
         data = request.get_json()
 
         try:
-            # update the city record. only name can be changed and country_id are allowed tob e modified
-            result = storage.update('City', city_id, data, ["name", country_id])
+            # update the city record. only name can be changed and country_id are allowed to be modified
+            result = storage.update('City', city_id, data, ["name", "country_id"])
         except IndexError as exc:
             print("Error: ", exc)
             return "City not found: unable to updated specified city!"
