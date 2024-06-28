@@ -60,6 +60,19 @@ class DBStorage():
         Session = scoped_session(session_factory)
         self.__session = Session()
 
+    @contextmanager
+    def session_scope(self):
+        """Provide a transactional scope around a series of operations"""
+
+        try:
+            yield self.__session
+            self.__session.commit()
+        excep Exception:
+            self.__session.rollback()
+            raise
+        finally:
+            self.__session.remove()
+
     def get(self, class_name = "", record_id = ""):
         """ Return data for specified class name with or without record id"""
 
